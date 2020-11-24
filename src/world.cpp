@@ -63,3 +63,32 @@ Color World::shade_ray(Ray& ray)
 
 	return background;
 }
+
+Color World::light_ray(const Ray& ray)
+{
+	float lights = (float) lightSourceList.size();
+	int ind = rand()%lightSourceList.size();
+	// printf("%d\n", ind);
+	Vector3D l = lightSourceList[ind]->getPosition() - ray.getPosition();
+	float dist = l.length();
+	l.normalize();
+	float cos_o = (float) lightSourceList[ind]->getcoso(-l);
+	float cos_i = (float) dotProduct(l,ray.getNormal());
+	Color total_intensity = Color(0);
+	if(cos_o < 0 && cos_i < 0){
+		return total_intensity;
+	}
+	int curLevel = ray.getLevel();
+	Ray shadow_ray = Ray(ray.getPosition(),l,curLevel+1);
+	float t = firstIntersection(shadow_ray);
+	lightSourceList[ind]->intersect(shadow_ray);
+	if(t == ray.getParameter()){
+		return total_intensity;
+	}
+	else{
+		total_intensity = lightSourceList[ind]->getIntensity();
+		// printf("%f\n", cos_i * cos_o * (lights/(dist * dist)));
+		float intense = 1.0;
+		return (total_intensity * cos_i * cos_o * intense * (lights/(dist * dist)));
+	}
+}

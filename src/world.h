@@ -40,5 +40,6 @@ public:
 	float firstIntersection(Ray& ray);
 	Color lightIntersection(Ray& ray); // intersection with plane light sources
 	Color shade_ray(Ray& ray);
+	Color light_ray(const Ray& ray);
 };
 #endif

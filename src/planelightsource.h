@@ -22,5 +22,7 @@ public:
 		}
 	Vector3D getPosition() const {return  p1 + (p2-p1)*((float)rand()/RAND_MAX) + (p3-p2)*((float)rand()/RAND_MAX);}
 	virtual bool intersect(Ray& r) const {return top.intersect(r) || bottom.intersect(r);} 
+	Vector3D getNormal() const { return crossProduct(p2-p1,p3-p1);}
+	float getcoso(Vector3D ray) const { return dotProduct(ray,getNormal());}
 };
 #endif

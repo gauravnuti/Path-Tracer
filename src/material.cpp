@@ -80,6 +80,7 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 			cos_i = (float) dotProduct(randDir,incident.getNormal());
 		Ray randRay = Ray(incidence_pos+epsilon*randDir,randDir,curLevel+1);
 		total_intensity =  total_intensity + 2* PI * (1.0f/(float)N) * (albedo/PI) * world->shade_ray(randRay)*color* cos_i;
+		// total_intensity = total_intensity + (albedo/PI) * world->light_ray(incident)*color;
 	}
 
 	total_intensity = total_intensity + emittance*color + world->getAmbient()*color;

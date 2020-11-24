@@ -18,6 +18,7 @@ public:
 	virtual bool intersect(Ray& ray) const = 0;
 	Color getIntensity() const {return intensity;}
 	bool getSolidity() const {return isSolid;}
-
+	virtual Vector3D getNormal() const = 0;
+	virtual float getcoso(Vector3D ray) const = 0;
 };
 #endif
