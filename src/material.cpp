@@ -65,22 +65,47 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 
 	// Random Direction Sampling
 	for(int i=0; i<N; i++){
-		cos_i = -0.1;
+		// cos_i = -0.1;
 
-		theta = (((float) drand48())*PI - PI/2.0f)*(1-pow(specularity,5));
-		phi = ((float) drand48())*PI; 
+		// theta = (((float) drand48())*PI - PI/2.0f)*(1-pow(specularity,5));
+		// phi = ((float) drand48())*PI; 
 
-		glm::vec3 randCartRay(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+		// glm::vec3 randCartRay(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+		// randTransRay = base_change_mat*randCartRay;
+		// randDir = Vector3D(randTransRay.x,randTransRay.y,randTransRay.z);
+		// randDir.normalize();
+		// if (specularity>0)
+		// 	cos_i = (float) dotProduct(randDir,reflect(incident).getDirection()); //incident.getNormal()); // should this be reflected_ray dir?
+		// else
+		// 	cos_i = (float) dotProduct(randDir,incident.getNormal());
+		// Ray randRay = Ray(incidence_pos+epsilon*randDir,randDir,curLevel+1);
+		// total_intensity =  total_intensity + 2* PI * (1.0f/(float)N) * (albedo/PI) * world->shade_ray(randRay)*color* cos_i;//sampling hemisphere
+		// total_intensity = total_intensity + (albedo/PI) * world->light_ray(incident)*color;//sampling lights
+
+		//sampling hemisphere - importance sampling
+		float r0 = drand48(), r1 = drand48();
+		float r = sqrt(r0);
+		float theta = 2 * PI * r1;
+		float x = r * cos( theta );
+		float y = r * sin( theta );
+		float solid_angle = -1;
+		glm::vec3 randCartRay(x,y,sqrt(1 - r0));
 		randTransRay = base_change_mat*randCartRay;
 		randDir = Vector3D(randTransRay.x,randTransRay.y,randTransRay.z);
 		randDir.normalize();
-		if (specularity>0)
-			cos_i = (float) dotProduct(randDir,reflect(incident).getDirection()); //incident.getNormal()); // should this be reflected_ray dir?
-		else
-			cos_i = (float) dotProduct(randDir,incident.getNormal());
+		cos_i = (float) dotProduct(randDir,incident.getNormal());
 		Ray randRay = Ray(incidence_pos+epsilon*randDir,randDir,curLevel+1);
-		total_intensity =  total_intensity + 2* PI * (1.0f/(float)N) * (albedo/PI) * world->shade_ray(randRay)*color* cos_i;
-		// total_intensity = total_intensity + (albedo/PI) * world->light_ray(incident)*color;
+		
+		Color direct = world->light_ray(incident, solid_angle);
+		float pdf_hemi = 1/(2*PI);
+		float pdf_direct = 1/solid_angle;
+
+		float ratio = pdf_direct/(pdf_direct + pdf_hemi);
+
+		float balance = ratio * (pdf_direct) + (1 - ratio) * pdf_hemi;
+
+		total_intensity = total_intensity + (1.0f/(float)N) * albedo *  world->shade_ray(randRay, 1) * color;
+		total_intensity = total_intensity + (1.0f/(float)N) * cos_i * (albedo/PI) * direct *color * (1/balance);
 	}
 
 	total_intensity = total_intensity + emittance*color + world->getAmbient()*color;

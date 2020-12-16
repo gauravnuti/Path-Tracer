@@ -33,7 +33,7 @@ float World::firstIntersection(Ray& ray)
 	return ray.getParameter();
 }
 
-Color World::shade_ray(Ray& ray)
+Color World::shade_ray(Ray& ray, int flag)
 {
 
 	// Check if we light source is hit
@@ -55,8 +55,10 @@ Color World::shade_ray(Ray& ray)
 	}
 
 	// return hit light source
-	if (light_hit)
+	if (light_hit && flag == 0)
 		return intensity;
+	if(light_hit)
+		return Color(0);
 
 	if (ray.getLevel()>0)
 		return Color(0);
@@ -64,7 +66,7 @@ Color World::shade_ray(Ray& ray)
 	return background;
 }
 
-Color World::light_ray(const Ray& ray)
+Color World::light_ray(const Ray& ray, float &solid_angle)
 {
 	float lights = (float) lightSourceList.size();
 	int ind = rand()%lightSourceList.size();
@@ -89,6 +91,7 @@ Color World::light_ray(const Ray& ray)
 		total_intensity = lightSourceList[ind]->getIntensity();
 		// printf("%f\n", cos_i * cos_o * (lights/(dist * dist)));
 		float intense = 1.0;
-		return (total_intensity * cos_i * cos_o * intense * (lights/(dist * dist)));
+		solid_angle = cos_o * (1/(dist * dist));
+		return (total_intensity * intense * lights);
 	}
 }
