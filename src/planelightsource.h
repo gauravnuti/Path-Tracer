@@ -31,6 +31,6 @@ public:
 		return intersection;
 	} 
 	Vector3D getNormal() const { return crossProduct(p2-p1,p3-p1);}
-	float getcoso(Vector3D ray) const { return dotProduct(ray,getNormal());}
+	float getcoso(Vector3D ray) const { return (getNormal()).length();}
 };
 #endif
