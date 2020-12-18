@@ -194,7 +194,6 @@ Color Material::shade(const Ray& incident, const float cur_throughput, const boo
 
 	// total_intensity =  (BRDF_dir/dir_PDF) * dir_illumination * color  +  (BRDF_hemi / hemi_PDF) * indir_illumination * color * cos_i;
 
-
 	total_intensity = (total_intensity + emittance*color + world->getAmbient()*color)*(1/temp_new_throughput);
 
 	return total_intensity;

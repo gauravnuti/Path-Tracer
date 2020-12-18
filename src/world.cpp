@@ -97,6 +97,7 @@ Color World::light_ray(const Ray& ray, float &solid_angle)
 	// float cos_o = (float) lightSourceList[ind]->getcoso(-l);
 	float cos_o = dotProduct( - ray.getDirection(), ray.getNormal());
 	cos_o = cos_o * (float) lightSourceList[ind]->getcoso(-l);
+
 	float cos_i = (float) dotProduct(l,ray.getNormal());
 	Color total_intensity = Color(0);
 	if(cos_o < 0 && cos_i < 0){
