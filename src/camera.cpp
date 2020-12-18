@@ -1,6 +1,7 @@
 #include "camera.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <iostream>
 
 Camera::Camera(const Vector3D& _pos, const Vector3D& _target, const Vector3D& _up, float _fovy, int _width, int _height) : 
 position(_pos), target(_target), up(_up), fovy(_fovy), width(_width), height(_height)
@@ -37,8 +38,16 @@ const Vector3D Camera::get_ray_direction(const int i, const int j) const
 {
 	Vector3D dir(0.0, 0.0, 0.0);
 	dir += -w * focalDistance;
-	float xw = aspect*(i - width/2.0 + 0.5)/width;
-	float yw = (j - height/2.0 + 0.5)/height;
+
+	// Random sampling of direction
+	float delta_x = (float)rand()/(float)(RAND_MAX)-0.5;
+	float delta_y = (float)rand()/(float)(RAND_MAX)-0.5;
+
+	float xw = aspect*(i - width/2.0 + 0.5 + delta_x)/width;
+	float yw = (j - height/2.0 + 0.5 + delta_y)/height;
+
+	// std::cout << aspect*(i - width/2.0 + 0.5)/width << "::" << xw << std::endl;
+
 	dir += u * xw;
 	dir += v * yw;
 

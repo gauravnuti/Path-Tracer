@@ -6,8 +6,14 @@
 #include "lightsource.h"
 #include "color.h"
 #include "ray.h"
+#include "settings.h"
 
-#define max_depth 2 // max recursion depth.
+struct RayIntersectionInfo{
+	Color emittance = Color(0);
+	bool hit=false;
+	int object_type=-1;
+	float t = FLT_MAX;
+};
 
 class World
 {

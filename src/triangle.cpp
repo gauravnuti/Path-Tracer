@@ -46,7 +46,7 @@ bool Triangle::intersect(Ray& r) const
 
 	Vector3D norm = crossProduct(p2-p1,p3-p1);
 
-    if (dotProduct(norm,x_d) < 0){norm = -1*norm;}
+    // if (dotProduct(norm,x_d) < 0){norm = -1*norm;}
 
 	//now check if discr. is posivtive or zero, then only we have an intersection!
 	if(beta + gamma <= 1.0)

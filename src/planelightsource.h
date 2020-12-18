@@ -3,6 +3,7 @@
 
 #include "lightsource.h"
 #include "triangle.h"
+#include "color.h"
 
 class PlaneLightSource : public LightSource
 {
@@ -21,7 +22,14 @@ public:
 			isSolid = true;
 		}
 	Vector3D getPosition() const {return  p1 + (p2-p1)*((float)rand()/RAND_MAX) + (p3-p2)*((float)rand()/RAND_MAX);}
-	virtual bool intersect(Ray& r) const {return top.intersect(r) || bottom.intersect(r);} 
+	bool intersect(Ray& r) const {
+		bool intersection = top.intersect(r) || bottom.intersect(r);
+		if (intersection){
+			Color emittance = getIntensity();
+			r.setIntensity(emittance);
+		}
+		return intersection;
+	} 
 	Vector3D getNormal() const { return crossProduct(p2-p1,p3-p1);}
 	float getcoso(Vector3D ray) const { return dotProduct(ray,getNormal());}
 };

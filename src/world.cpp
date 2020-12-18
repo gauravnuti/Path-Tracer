@@ -27,14 +27,37 @@ Color World::lightIntersection(Ray& ray){
 
 float World::firstIntersection(Ray& ray)
 {
+
+	// float cur_t = FLT_MAX;
+
 	for(int i=0; i<objectList.size(); i++)
 		objectList[i]->intersect(ray);
+
+	// if(ray.didHit()) // Not a light source
+	// 	ray.setObjectType(false); 
+	// 	cur_t = ray.getParameter();
+
+	// for(int i=0; i<lightSourceList.size(); i++){
+	// 	if (lightSourceList[i]->getSolidity() == true){
+	// 		lightSourceList[i]->intersect(ray);
+	// 	}
+	// }
+
+	// if (ray.getParameter() < cur_t){
+	// 	ray.setObjectType(true); 
+	// }
 
 	return ray.getParameter();
 }
 
 Color World::shade_ray(Ray& ray, int flag)
 {
+	// firstIntersection(ray);
+
+	// if (ray.didHit() && ray.getLevel() <= max_depth )
+	// 	return ray.intersected()->shade(ray);
+	// return background;
+
 
 	// Check if we light source is hit
 	Color intensity = lightIntersection(ray);
@@ -47,14 +70,11 @@ Color World::shade_ray(Ray& ray, int flag)
 	float obj_t = firstIntersection(ray);
 	if(ray.didHit() && ray.getLevel() <= max_depth){
 		if (obj_t < light_t){
-			// if (ray.getLevel()>1){
-			// 	std::cout <<  ray.getLevel() << std::endl;
-			// }
 			return (ray.intersected())->shade(ray);
 		}
 	}
 
-	// return hit light source
+	// return hit light source1
 	if (light_hit && flag == 0)
 		return intensity;
 	if(light_hit)
@@ -75,6 +95,7 @@ Color World::light_ray(const Ray& ray, float &solid_angle)
 	float dist = l.length();
 	l.normalize();
 	float cos_o = (float) lightSourceList[ind]->getcoso(-l);
+	// float cos_o = (float) dotProduct(ray.getPosition(),ray.getNormal());
 	float cos_i = (float) dotProduct(l,ray.getNormal());
 	Color total_intensity = Color(0);
 	if(cos_o < 0 && cos_i < 0){

@@ -2,7 +2,7 @@
 
 bool Ray::setParameter(const float par, const  Vector3D& norm, const Object *obj)
 {
-	if(par < t && par > SMALLEST_DIST)
+	if(par < t && par > EPSILON)
 	{
 		hit = true;
 		t = par;
@@ -13,3 +13,13 @@ bool Ray::setParameter(const float par, const  Vector3D& norm, const Object *obj
 	}
 	return false;
 }
+
+void Ray::setObjectType(bool isLight){
+	if(isLight){
+		object_type=LIGHT_SOURCE;
+	} 
+	else{
+		object_type=NON_LIGHT;
+	}
+}
+

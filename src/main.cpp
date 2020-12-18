@@ -46,92 +46,108 @@ int main(int, char**)
 
     //Create a world
     World *world = new World;
-    world->setAmbient(Color(0.1));
+    world->setAmbient(Color(0.01));
     world->setBackground(Color(0.1, 0.3, 0.7));
 
 
     //Create Sandbox limits
     int front_z = 30;
-    int back_z = -15;
+    int back_z = -12;
     int right_x = 10;
     int left_x = -10;
     int bottom_y = 3;
     int top_y = -5;
+
+    float sphere_albedo = 1;
+    float plane_albedo = 1;
     
     // //////////////////////////////////////////////////////////////////////////////////////////
     // Scene 1
     // //////////////////////////////////////////////////////////////////////////////////////////
     Material *m1 = new Material(world);
     m1->color = Color(0.1, 0.7, 0.5);
-    m1->albedo = 2;
+    m1->albedo = sphere_albedo;
 
     Material *m2 = new Material(world);
     m2->color = Color(0.7, 0.1, 0.3);
-    m2->albedo = 2; m2->specularity=1;
+    m2->albedo = sphere_albedo;// m2->specularity=1;
 
 
     Material *ground = new Material(world);
     ground->color = Color(0.95, 0.7, 0.7);
-    ground->albedo = 1.3;ground->specularity=0.97;
+    ground->albedo = plane_albedo;// ground->specularity=0.9;
 
-    Material *wall = new Material(world);
-    wall->color = Color(0.8, 0.1, 0.1);
-    wall->albedo = 1.1;wall->emittance = Color(0.2,0.3,0.2);
+    Material *left_wall = new Material(world);
+    left_wall->color = Color(0.0, 0.4, 0.7);
+    left_wall->albedo = plane_albedo;//left_wall->emittance = Color(0.2,0.3,0.2);
+
+    Material *right_wall = new Material(world);
+    right_wall->color = Color(0.8, 0.1, 0.1);
+    right_wall->albedo = plane_albedo;//right_wall->emittance = Color(0.2,0.3,0.2);
 
     Material *back_wall = new Material(world);
-    back_wall->color = Color(0.1, 0.7, 0.1);
-    back_wall->albedo = 1.1;back_wall->emittance = Color(0.2,0.2,0.2);
+    back_wall->color = Color(0.4, 0.0, 0.4);
+    back_wall->albedo = plane_albedo;//back_wall->specularity=1.0;//back_wall->emittance = Color(0.2,0.2,0.2);
 
     Material *ceiling = new Material(world);
     ceiling->color = Color(1, 0.7, 0.1);
-    ceiling->albedo = 1.1;ceiling->emittance = Color(0.2,0.2,0.2);
+    ceiling->albedo = plane_albedo;//ceiling->emittance = Color(0.2,0.2,0.2);
     
     
-    Object *sphere1 = new Sphere(Vector3D(-4, 0, -10), 3, m1);
+    Object *sphere1 = new Sphere(Vector3D(-3, 0.5, -5), 2.5, m1);
     world->addObject(sphere1);
 
-    Object *sphere2 = new Sphere(Vector3D(4, 0, -10), 3, m2);
+    Object *sphere2 = new Sphere(Vector3D(3, 0.5, -5), 2.5, m2);
     world->addObject(sphere2);
 
 
     // Creating Sandbox
 
     // Ground
-    Object *ground_traingle1 = new Triangle(Vector3D(right_x, bottom_y, front_z), Vector3D(right_x, bottom_y, back_z), Vector3D(left_x, bottom_y, back_z), ground);
+    Object *ground_traingle1 = new Triangle(Vector3D(right_x, bottom_y, front_z), Vector3D(left_x, bottom_y, back_z), Vector3D(right_x, bottom_y, back_z), ground);
     world->addObject(ground_traingle1);
-    Object *ground_traingle2 = new Triangle(Vector3D(left_x, bottom_y, back_z), Vector3D(left_x, bottom_y, front_z), Vector3D(right_x, bottom_y, front_z), ground);
+    Object *ground_traingle2 = new Triangle(Vector3D(left_x, bottom_y, back_z), Vector3D(right_x, bottom_y, front_z), Vector3D(left_x, bottom_y, front_z), ground);
     world->addObject(ground_traingle2);
 
     // Left Wall
-    Object *left_traingle1 = new Triangle( Vector3D(left_x, top_y, back_z), Vector3D(left_x, bottom_y, back_z),Vector3D(left_x, bottom_y, front_z), wall);
+    Object *left_traingle1 = new Triangle( Vector3D(left_x, top_y, back_z), Vector3D(left_x, bottom_y, back_z),Vector3D(left_x, bottom_y, front_z), left_wall);
     world->addObject(left_traingle1);
-    Object *left_traingle2 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(left_x, top_y, front_z), Vector3D(left_x, bottom_y, front_z), wall);
+    Object *left_traingle2 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(left_x, bottom_y, front_z), Vector3D(left_x, top_y, front_z), left_wall);
     world->addObject(left_traingle2);
 
     // Right Wall
-    Object *right_traingle1 = new Triangle(Vector3D(right_x, bottom_y, back_z), Vector3D(right_x, top_y, back_z), Vector3D(right_x, bottom_y, front_z), wall);
+    Object *right_traingle1 = new Triangle(Vector3D(right_x, bottom_y, back_z), Vector3D(right_x, top_y, back_z), Vector3D(right_x, bottom_y, front_z), right_wall);
     world->addObject(right_traingle1);
-    Object *right_traingle2 = new Triangle(Vector3D(right_x, top_y, back_z), Vector3D(right_x, top_y, front_z), Vector3D(right_x, bottom_y, front_z), wall);
+    Object *right_traingle2 = new Triangle(Vector3D(right_x, top_y, back_z), Vector3D(right_x, top_y, front_z), Vector3D(right_x, bottom_y, front_z), right_wall);
     world->addObject(right_traingle2);
 
     // Back Wall
-    Object *back_traingle1 = new Triangle(Vector3D(left_x, bottom_y, back_z), Vector3D(left_x, top_y, back_z), Vector3D(right_x, bottom_y, back_z), back_wall);
+    Object *back_traingle1 = new Triangle(Vector3D(left_x, bottom_y, back_z), Vector3D(left_x, top_y, back_z),  Vector3D(right_x, bottom_y, back_z), back_wall);
     world->addObject(back_traingle1);
-    Object *back_traingle2 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(right_x, top_y, back_z), Vector3D(right_x, bottom_y, back_z), back_wall);
+    Object *back_traingle2 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(right_x, top_y, back_z),  Vector3D(right_x, bottom_y, back_z), back_wall);
     world->addObject(back_traingle2);
 
     // Ceiling
     Object *top_traingle1 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(left_x, top_y, front_z), Vector3D(right_x, top_y, front_z), ceiling);
     world->addObject(top_traingle1);
-    Object *top_traingle2 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(right_x, top_y, back_z), Vector3D(right_x, top_y, front_z), ceiling);
+    Object *top_traingle2 = new Triangle(Vector3D(left_x, top_y, back_z), Vector3D(right_x, top_y, front_z), Vector3D(right_x, top_y, back_z), ceiling);
     world->addObject(top_traingle2);
 
 
-    LightSource *light1 = new PlaneLightSource(world, Vector3D(-5, -5, 2), Vector3D(5, -5, 2), Vector3D(5, -5, -6), Color(1, 1, 1));
+    LightSource *light1 = new PlaneLightSource(world, Vector3D(-5, -5, 2), Vector3D(5, -5, 2), Vector3D(5, -5, -12), Color(1, 1, 1));
     world->addLight(light1);
 
-    // LightSource *light4 = new PlaneLightSource(world, Vector3D(8, -3, 8), Vector3D(14, -3, 4), Vector3D(14, 3, 4), Color(1, 1, 1));
+    // LightSource *light2 = new PlaneLightSource(world, Vector3D(-5, -5, 2), Vector3D(-3, -5, 2), Vector3D(-3, -5, -1), Color(1, 1, 1));
+    // world->addLight(light2);
+
+    // LightSource *light3 = new PlaneLightSource(world, Vector3D(2, -5, 2), Vector3D(5, -5, 2), Vector3D(5, -5, -1), Color(1, 1, 1));
+    // world->addLight(light3);
+
+    // LightSource *light4 = new PlaneLightSource(world, Vector3D(-5, -5, -4), Vector3D(-3, -5, -4), Vector3D(-3, -5, -7), Color(1, 1, 1));
     // world->addLight(light4);
+
+    // LightSource *light5 = new PlaneLightSource(world, Vector3D(2, -5, -4), Vector3D(5, -5, -4), Vector3D(5, -5, -7), Color(1, 1, 1));
+    // world->addLight(light5);
 
     // //////////////////////////////////////////////////////////////////////////////////////////
 
