@@ -50,7 +50,7 @@ float World::firstIntersection(Ray& ray)
 	return ray.getParameter();
 }
 
-Color World::shade_ray(Ray& ray, int flag)
+Color World::shade_ray(Ray& ray, int flag, const float cur_throughput)
 {
 	// firstIntersection(ray);
 
@@ -70,7 +70,7 @@ Color World::shade_ray(Ray& ray, int flag)
 	float obj_t = firstIntersection(ray);
 	if(ray.didHit() && ray.getLevel() <= max_depth){
 		if (obj_t < light_t){
-			return (ray.intersected())->shade(ray);
+			return (ray.intersected())->shade(ray,cur_throughput);
 		}
 	}
 
@@ -94,8 +94,9 @@ Color World::light_ray(const Ray& ray, float &solid_angle)
 	Vector3D l = lightSourceList[ind]->getPosition() - ray.getPosition();
 	float dist = l.length();
 	l.normalize();
-	float cos_o = (float) lightSourceList[ind]->getcoso(-l);
-	// float cos_o = (float) dotProduct(ray.getPosition(),ray.getNormal());
+	// float cos_o = (float) lightSourceList[ind]->getcoso(-l);
+	float cos_o = dotProduct( - ray.getDirection(), ray.getNormal());
+	cos_o = cos_o * (float) lightSourceList[ind]->getcoso(-l);
 	float cos_i = (float) dotProduct(l,ray.getNormal());
 	Color total_intensity = Color(0);
 	if(cos_o < 0 && cos_i < 0){
@@ -113,6 +114,6 @@ Color World::light_ray(const Ray& ray, float &solid_angle)
 		// printf("%f\n", cos_i * cos_o * (lights/(dist * dist)));
 		float intense = 1.0;
 		solid_angle = cos_o * (1/(dist * dist));
-		return (total_intensity * intense * lights);
+		return (total_intensity * intense * lights * cos_i);
 	}
 }

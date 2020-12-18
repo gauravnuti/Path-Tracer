@@ -15,9 +15,9 @@ protected:
 public:
 	Object(Material *mat): material(mat) {}	
 	virtual bool intersect(Ray& ray) const = 0;
-	virtual Color shade(const Ray& ray) const
+	virtual Color shade(const Ray& ray, float throughput) const
 	{
-		return material->shade(ray, isSolid);
+		return material->shade(ray, throughput, isSolid);
 	}
 };
 

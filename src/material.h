@@ -35,7 +35,7 @@ public:
 
 	Ray reflect(const Ray& incident) const;
 	Color refract(const Ray& incident, const int sign) const;
-	Color shade(const Ray& incident, const bool isSolid) const;
+	Color shade(const Ray& incident, const float cur_throughput, const bool isSolid) const;
 
 
 };

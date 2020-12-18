@@ -79,7 +79,7 @@ Ray Material::reflect(const Ray& incident) const
 	return reflected_ray;
 }
 
-Color Material::shade(const Ray& incident, const bool isSolid) const
+Color Material::shade(const Ray& incident, const float cur_throughput, const bool isSolid) const
 {
 	// Initializing values for donwstream rendering equation
 	Color total_intensity = Color(0);
@@ -127,7 +127,7 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 	////////////////////////////
 	// Random Direction Sampling
 	
-	int sampling_model_flag;
+	// int sampling_model_flag;
 	float hemi_PDF;
 	float dir_PDF;
 	float BRDF = albedo/PI;
@@ -142,7 +142,6 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 		randDir = diffuseReflection(specularity, specular_flag, base_change_mat);
 	}
 	
-
 
 	// Computing cos of angle of random ray with w-axis in uvw space
 	if (specular_flag>0)
@@ -161,30 +160,42 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 		hemi_PDF = 1/(2*PI);
 	}
 
-	// Hemisphere Sampling
-	// sampling_model_flag = 0;
-	// total_intensity =  total_intensity +  (BRDF / hemi_PDF) * world->shade_ray(randRay,sampling_model_flag)*color* cos_i;
-
 	// Direct Light Sampling
-	Color direct_throughput = world->light_ray(incident, solid_angle);
+	Color dir_illumination = world->light_ray(incident, solid_angle);
 	dir_PDF = 1/solid_angle;
-	total_intensity = total_intensity + (BRDF/dir_PDF) * direct_throughput *color;
+	Color out_dir_illumination = (BRDF/dir_PDF) * dir_illumination * color;
+	total_intensity = total_intensity + out_dir_illumination;
+
+	// Implementing russian roullette
+	float max_throughput = (float)std::max(out_dir_illumination.R(),std::max(out_dir_illumination.G(),out_dir_illumination.B()));
+	const float new_throughput = std::min(cur_throughput + std::abs(max_throughput),1.0f);
+	float temp_new_throughput = 1.0f;
+
+	float drop = (float) drand48();
+
+	// Start dropping only after a certain depth
+	if (incident.getLevel() > RUSSIAN_ROULETTE_START)
+		temp_new_throughput = new_throughput;
+
+	if (drop > temp_new_throughput){
+		total_intensity = (total_intensity + emittance*color + world->getAmbient()*color)*(1/temp_new_throughput);
+		return total_intensity;
+	}
+
+	// Hemisphere Sampling
+	Color indir_illumination = world->shade_ray(randRay,sampling_model_flag,new_throughput);
+	total_intensity =  total_intensity +  (BRDF / hemi_PDF) * indir_illumination * color * cos_i;
 
 
+	// Multiple Importance Sampling - Balance Heuristics
+	// float compbined_PDF = dir_PDF+hemi_PDF;
+	// float BRDF_dir = dir_PDF/compbined_PDF;
+	// float BRDF_hemi = hemi_PDF/compbined_PDF;
 
-	// Color direct = world->light_ray(incident, solid_angle);
-	// float pdf_hemi = 1/(2*PI);
-	// float pdf_direct = 1/solid_angle;
-
-	// float ratio = pdf_direct/(pdf_direct + pdf_hemi);
-
-	// float balance = ratio * (pdf_direct) + (1 - ratio) * pdf_hemi;
-
-	// total_intensity = total_intensity + albedo *  world->shade_ray(randRay, 1) * color;
-	// total_intensity = total_intensity + cos_i * (albedo/PI) * direct *color * (1/balance);
+	// total_intensity =  (BRDF_dir/dir_PDF) * dir_illumination * color  +  (BRDF_hemi / hemi_PDF) * indir_illumination * color * cos_i;
 
 
-	total_intensity = total_intensity + emittance*color + world->getAmbient()*color;
+	total_intensity = (total_intensity + emittance*color + world->getAmbient()*color)*(1/temp_new_throughput);
 
 	return total_intensity;
 }
