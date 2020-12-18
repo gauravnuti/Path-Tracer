@@ -172,7 +172,7 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 
 
 	// Multiple Importance Sampling - Balance Heuristic
-	compbined_PDF = dir_PDF+hemi_PDF;
+	float compbined_PDF = dir_PDF+hemi_PDF;
 	float BRDF_dir = dir_PDF/compbined_PDF;
 	float BRDF_hemi = hemi_PDF/compbined_PDF;
 
