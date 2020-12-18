@@ -171,18 +171,12 @@ Color Material::shade(const Ray& incident, const bool isSolid) const
 	total_intensity = total_intensity + (BRDF/dir_PDF) * direct_throughput *color;
 
 
+	// Multiple Importance Sampling - Balance Heuristic
+	compbined_PDF = dir_PDF+hemi_PDF;
+	float BRDF_dir = dir_PDF/compbined_PDF;
+	float BRDF_hemi = hemi_PDF/compbined_PDF;
 
-	// Color direct = world->light_ray(incident, solid_angle);
-	// float pdf_hemi = 1/(2*PI);
-	// float pdf_direct = 1/solid_angle;
-
-	// float ratio = pdf_direct/(pdf_direct + pdf_hemi);
-
-	// float balance = ratio * (pdf_direct) + (1 - ratio) * pdf_hemi;
-
-	// total_intensity = total_intensity + albedo *  world->shade_ray(randRay, 1) * color;
-	// total_intensity = total_intensity + cos_i * (albedo/PI) * direct *color * (1/balance);
-
+	total_intensity =  (BRDF_dir/dir_PDF) * dir_illumination * color  +  (BRDF_hemi / hemi_PDF) * indir_illumination * color * cos_i;
 
 	total_intensity = total_intensity + emittance*color + world->getAmbient()*color;
 
